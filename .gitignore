@@ -1,6 +1,6 @@
 .gradle
-/gradle/
-/bin/
+gradle/
+bin/
 /build/
 .settings
 gradlew
