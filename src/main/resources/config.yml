@@ -1,0 +1,15 @@
+website: ''
+mysql:
+  host: 'localhost'
+  username: 'root'
+  password: 'password'
+forum:
+  database: 'forums'
+forums-sql-prefix: 'mybb_'
+discord:
+  database ''
+  bot-token: ''
+  server-id: ''
+  discord-command-prefix: '!'
+  discord-database-prefix: 'BridgeE_'
+  

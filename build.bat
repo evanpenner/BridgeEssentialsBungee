@@ -1,0 +1,2 @@
+gradlew shadowJar
+PAUSE
