@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.channels.Channels;
@@ -99,13 +101,15 @@ public class BungeeBridge extends Plugin {
 			URL url = myJar.toURI().toURL();
 			URL[] urls = new URL[] { url };
 			URLClassLoader classLoader = new URLClassLoader(urls);
-			Class<JDABuilder> classJda = (Class<JDABuilder>) classLoader.loadClass("net.dv8tion.jda.api.JDABuilder");
+			Class<JDABuilder> classToLoad = (Class<JDABuilder>) classLoader.loadClass("net.dv8tion.jda.api.JDABuilder");
 
-			JDABuilder instance = classJda.newInstance();
+			Method method = classToLoad.getDeclaredMethod ("JDABuilder");
+			Object instance = classToLoad.newInstance ();
+			Object result = method.invoke (instance);
 			classLoader.close();
-			return instance;
+			return (JDABuilder)result;
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | ClassNotFoundException
-				| InstantiationException | IOException e) {
+				| InstantiationException | IOException | InvocationTargetException | NoSuchMethodException e) {
 			getLogger().severe("Unable to load JDA library!");
 			e.printStackTrace();
 		}
