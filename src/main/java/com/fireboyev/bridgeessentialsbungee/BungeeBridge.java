@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -24,15 +23,19 @@ public class BungeeBridge extends Plugin {
 	private final String JDAVERSION = "4.0.0_39";
 	private DiscordService dService;
 	public Configuration config;
+	private static ClassPathHacker cph;
 
 	@Override
 	public void onEnable() {
 		resolveConfig();
+		cph = new ClassPathHacker(this);
 		getLogger().info("Downloading Required JDA Libraries...");
 		DownloadLibraries(new File(this.getDataFolder(), "lib/"));
 		getLogger().info("Library Download Complete.");
 		getLogger().info("Loading JDA Library...");
-		JDABuilder builder = LoadJDA(new File(this.getDataFolder(), "lib/"));
+		File jar = new File(new File(this.getDataFolder(), "lib/"), "JDA-" + JDAVERSION + ".jar");
+		cph.loadJar(jar.toPath());
+		JDABuilder builder = new JDABuilder();
 		getLogger().info("JDA Library Loaded.");
 		getLogger().info("Loading Configuration Files");
 		try {
@@ -94,26 +97,21 @@ public class BungeeBridge extends Plugin {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private JDABuilder LoadJDA(File folder) {
-		try {
-			File myJar = new File(folder, "JDA-" + JDAVERSION + ".jar");
-			URL url = myJar.toURI().toURL();
-			URL[] urls = new URL[] { url };
-			URLClassLoader classLoader = new URLClassLoader(urls);
-			Class<JDABuilder> classToLoad = (Class<JDABuilder>) classLoader.loadClass("net.dv8tion.jda.api.JDABuilder");
 
-			Method method = classToLoad.getDeclaredMethod ("JDABuilder");
-			Object instance = classToLoad.newInstance ();
-			Object result = method.invoke (instance);
-			classLoader.close();
-			return (JDABuilder)result;
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | ClassNotFoundException
-				| InstantiationException | IOException | InvocationTargetException | NoSuchMethodException e) {
-			getLogger().severe("Unable to load JDA library!");
+		File myJar = new File(folder, "JDA-" + JDAVERSION + ".jar");
+		try {
+
+			Constructor<?> cs = ClassLoader.getSystemClassLoader().loadClass("net.dv8tion.jda.api.JDABuilder")
+					.getConstructor(String.class);
+			JDABuilder instance = (JDABuilder) cs.newInstance();
+			return instance;
+		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException
+				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return new JDABuilder();
 	}
 
 	private void initDiscordService(JDABuilder builder) {

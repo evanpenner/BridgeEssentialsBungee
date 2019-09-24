@@ -7,7 +7,7 @@ forum:
   database: 'forums'
 forums-sql-prefix: 'mybb_'
 discord:
-  database ''
+  database: ''
   bot-token: ''
   server-id: ''
   discord-command-prefix: '!'

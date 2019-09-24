@@ -18,7 +18,10 @@ repositories {
 
 dependencies {
     compileOnly "net.md-5:bungeecord-api:1.13-SNAPSHOT"
-    compileOnly "net.dv8tion:JDA:4.0.0_46"
+    compileOnly('net.dv8tion:JDA:4.0.0_46') {
+     exclude group: 'org.slf4j'
+  	}
+  	compile "org.slf4j:slf4j-jdk14:1.7.5"
 }
 
 processResources {
@@ -30,6 +33,9 @@ processResources {
 
 shadowJar {
     archiveName = "BridgeEssentials-1.0.jar"
+    dependencies {
+    	include dependency("org.slf4j:slf4j-jdk14:1.7.5")	
+    }
 }
 
 artifacts {

@@ -14,7 +14,7 @@ public class DiscordService {
 		JDABuilder jdaBuilder = builder;
 		jdaBuilder.setToken(config.getString("discord.bot-token"));
 		jdaBuilder.setAutoReconnect(true);
-		jdaBuilder.setActivity(Activity.streaming("The server", config.getString("website", "http://google.com")));
+		jdaBuilder.setActivity(Activity.watching(" the progress of the server"));
 		try {
 			this.JDA = jdaBuilder.build();
 		} catch (LoginException e) {
